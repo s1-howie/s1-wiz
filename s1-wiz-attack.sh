@@ -52,10 +52,12 @@ aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port
 
 ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
 --key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID --tag-specifications $TAGS \
---iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}")  
+--iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh)  
   
   
 # #--user-data file://$STARTUP_SCRIPT_PATH 
 # PUBLIC_KEY=
 # mkdir -p ~/.ssh
 # echo $PUBLIC_KEY >> ~/.ssh/authorized_keys
+
+
