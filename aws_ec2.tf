@@ -1,6 +1,6 @@
 
-resource "random_pet" "name" {
-}
+# resource "random_pet" "name" {
+# }
 
 # For full list of filters, see: https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
 
@@ -44,7 +44,7 @@ data "aws_ami" "latest_ami" {
   }
 }
 
-resource "aws_instance" "testInstance" {
+resource "aws_instance" "s1_wiz_instance" {
   tags = merge(
     var.tags,
     {
@@ -53,7 +53,7 @@ resource "aws_instance" "testInstance" {
   )
   ami                    = data.aws_ami.latest_ami.image_id
   instance_type          = var.ec2_instance_type
-  vpc_security_group_ids = [aws_security_group.sg_22.id]
+  vpc_security_group_ids = [aws_security_group.sg_s1_wiz.id]
   key_name               = var.keypair
   iam_instance_profile   = aws_iam_instance_profile.web_profile.name
   user_data              = <<EOF
@@ -67,8 +67,8 @@ EOF
 }
 
 
-resource "aws_security_group" "sg_22" {
-  name = "aws-amzn2-cws-sg1"
+resource "aws_security_group" "sg_s1_wiz" {
+  name = "aws-amzn2-cws-wiz-sg1"
 
   # SSH access from the VPC
   ingress {
@@ -97,12 +97,12 @@ resource "aws_security_group" "sg_22" {
 
 
 resource "aws_iam_instance_profile" "web_profile" {
-  name = "aws-amzn2-cws-instance-profile"
-  role = aws_iam_role.web_role.name
+  name = "aws-amzn2-s1-wiz-instance-profile"
+  role = aws_iam_role.s1_wiz_role.name
 }
 
-resource "aws_iam_role" "web_role" {
-  name = "aws-amzn2-cws-iam-role"
+resource "aws_iam_role" "s1_wiz_role" {
+  name = "aws-amzn2-s1-wiz-iam-role"
   path = "/"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -118,12 +118,13 @@ resource "aws_iam_role" "web_role" {
     ]
   })
   inline_policy {
-    name = "aws-amzn2-inline-policy"
+    name = "aws-amzn2-s1-wiz-inline-admin-policy"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
         {
-          Action   = ["ec2:Describe*"]
+          #Action   = ["ec2:Describe*"]
+          Action   = ["*"]
           Effect   = "Allow"
           Resource = "*"
         },
@@ -134,17 +135,17 @@ resource "aws_iam_role" "web_role" {
 
 
 output "instance_EIP" {
-  value = aws_instance.testInstance.public_ip
+  value = aws_instance.s1_wiz_instance.public_ip
 }
 output "connect_via_ssh" {
-  value = "ssh -i ~/.ssh/${var.keypair}.pem ubuntu@${aws_instance.testInstance.public_ip}"
+  value = "ssh -i ~/.ssh/${var.keypair}.pem ec2-user@${aws_instance.s1_wiz_instance.public_ip}"
 }
 output "start_instance" {
-  value = "aws ec2 start-instances --instance-ids ${aws_instance.testInstance.id}"
+  value = "aws ec2 start-instances --instance-ids ${aws_instance.s1_wiz_instance.id}"
 }
 output "stop_instance" {
-  value = "aws ec2 stop-instances --instance-ids ${aws_instance.testInstance.id}"
+  value = "aws ec2 stop-instances --instance-ids ${aws_instance.s1_wiz_instance.id}"
 }
 output "get_public_ip" {
-  value = "aws ec2 describe-instances --instance-ids ${aws_instance.testInstance.id} | jq -r '.Reservations[].Instances[].PublicIpAddress'"
+  value = "aws ec2 describe-instances --instance-ids ${aws_instance.s1_wiz_instance.id} | jq -r '.Reservations[].Instances[].PublicIpAddress'"
 }

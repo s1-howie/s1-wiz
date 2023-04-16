@@ -36,7 +36,7 @@ BEER='\U1F37A'
 ################################################################################
 # AWS
 ################################################################################
-
+CSP='AWS'
 printf "\n${Purple}Running Automation for $CSP...${Color_Off}\n"
 
 printf "\n${Purple}Running 'terraform init'...${Color_Off}\n"
