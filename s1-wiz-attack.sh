@@ -35,7 +35,7 @@ SECURITY_GROUPS=$(curl --silent http://169.254.169.254/latest/meta-data/security
 INTERFACE=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/)
 SUBNET_ID=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/subnet-id)
 VPC_ID=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/vpc-id)
-TAGS="ResourceType=instance,Tags=[{Key='Name',Value='cha-ching'},{Key='Environment',Value='s1-wiz-demo'},{Key='Owner',Value='Johnny_Ataquero'}]"
+TAGS='ResourceType=instance,Tags=[{Key=Name,Value=cha-ching},{Key=Environment,Value=s1-wiz-demo},{Key=Owner,Value=Johnny_Ataquero}]'
 IAM_INFO=$(curl --silent http://169.254.169.254/latest/meta-data/iam/info)
 INSTANCE_PROFILE_ARN=$(echo $IAM_INFO | jq -r ".InstanceProfileArn")
 
@@ -65,14 +65,22 @@ function awscli_check () {
     if ! [[ -x "$(which aws)" ]]; then
         printf "\n${Yellow}INFO:  Installing AWSCLI utility... ${Color_Off}\n"
         if [[ $1 = 'apt' ]]; then
-            sudo apt-get update && sudo apt-get install -y awscli
+            sudo apt-get update && sudo apt-get install -y unzip
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
         elif [[ $1 = 'yum' ]]; then
-            sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-            sudo yum install -y awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
         elif [[ $1 = 'zypper' ]]; then
-            sudo zypper install -y awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
         elif [[ $1 = 'dnf' ]]; then
-            sudo dnf install -y awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
         else
             printf "\n${Red}ERROR:  Unsupported package manager: $1.${Color_Off}\n"
         fi
@@ -125,8 +133,7 @@ curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
 
 ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
 --key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID \
---iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh)  
-#--tag-specifications $TAGS \
+--iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh --tag-specifications $TAGS )
   
   
 # #--user-data file://$STARTUP_SCRIPT_PATH 
