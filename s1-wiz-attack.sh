@@ -125,7 +125,12 @@ SG_DESC=SG-s1-wiz
 
 sg_response=$(aws ec2 create-security-group --group-name $SG_NAME --description "${SG_DESC}" --vpc-id $VPC_ID)
 SG_ID=$(echo $sg_response | jq -r ".GroupId")
-MY_IP="75.190.238.157"  #$(curl --silent https://checkip.amazonaws.com)
+
+
+############################################## TODO:  Make this dynamic!!!! ##############################################
+MY_IP="$1:=75.190.238.159"  #$(curl --silent https://checkip.amazonaws.com)
+##########################################################################################################################
+
 aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 22 --cidr "${MY_IP}/32" > /dev/null 2>&1 
 
 # Download xmrig.sh from repo to pass to EC2 instance
