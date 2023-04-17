@@ -51,7 +51,7 @@ MY_IP="75.190.238.157"  #$(curl --silent https://checkip.amazonaws.com)
 aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 22 --cidr "${MY_IP}/32" > /dev/null 2>&1 
 
 # Download xmrig.sh from repo to pass to EC2 instance
-curl -sLO https://github.com/s1-howie/s1-wiz/blob/main/xmrig.sh
+curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
 
 ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
 --key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID --tag-specifications $TAGS \
