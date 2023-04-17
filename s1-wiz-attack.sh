@@ -128,10 +128,10 @@ SG_ID=$(echo $sg_response | jq -r ".GroupId")
 
 
 ############################################## TODO:  Make this dynamic!!!! ##############################################
-MY_IP="$1:=75.190.238.159"  #$(curl --silent https://checkip.amazonaws.com)
+MY_IP_CIDR="$1:=75.190.238.159/32"  #$(curl --silent https://checkip.amazonaws.com)
 ##########################################################################################################################
 
-aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 22 --cidr "${MY_IP}/32" > /dev/null 2>&1 
+aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 22 --cidr "${MY_IP_CIDR}" > /dev/null 2>&1 
 
 # Download xmrig.sh from repo to pass to EC2 instance
 curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
