@@ -69,12 +69,12 @@ function awscli_check () {
                 sudo apt-get update && sudo apt-get install -y unzip
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                 unzip awscliv2.zip
-                sudo ./aws/install
+                sudo ./aws/install --update
             else
                 apt-get update && apt-get install -y unzip
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                 unzip awscliv2.zip
-                ./aws/install
+                ./aws/install --update
             fi
         elif [[ $1 = 'yum' ]]; then
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -138,7 +138,9 @@ curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
 ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
 --key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID \
 --iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh --tag-specifications $TAGS )
-  
+
+echo $ec2_run_instances > ec2_run_instances.txt
+
   
 # #--user-data file://$STARTUP_SCRIPT_PATH 
 # PUBLIC_KEY=
