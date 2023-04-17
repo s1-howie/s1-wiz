@@ -65,10 +65,17 @@ function awscli_check () {
     if ! [[ -x "$(which aws)" ]]; then
         printf "\n${Yellow}INFO:  Installing AWSCLI utility... ${Color_Off}\n"
         if [[ $1 = 'apt' ]]; then
-            sudo apt-get update && sudo apt-get install -y unzip
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            if [[ -x "$(which sudo)" ]]; then
+                sudo apt-get update && sudo apt-get install -y unzip
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                sudo ./aws/install
+            else
+                apt-get update && apt-get install -y unzip
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                ./aws/install
+            fi
         elif [[ $1 = 'yum' ]]; then
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
@@ -92,21 +99,13 @@ function awscli_check () {
 # Detect if the Linux Platform uses RPM/DEB packages and the correct Package Manager to use
 function detect_pkg_mgr_info () {
     if (cat /etc/*release |grep 'ID=ubuntu' || cat /etc/*release |grep 'ID=debian'); then
-        FILE_EXTENSION='.deb'
         PACKAGE_MANAGER='apt'
-        AGENT_INSTALL_SYNTAX='dpkg -i'
     elif (cat /etc/*release |grep 'ID="rhel"' || cat /etc/*release |grep 'ID="amzn"' || cat /etc/*release |grep 'ID="centos"' || cat /etc/*release |grep 'ID="ol"' || cat /etc/*release |grep 'ID="scientific"' || cat /etc/*release |grep 'ID="rocky"' || cat /etc/*release |grep 'ID="almalinux"'); then
-        FILE_EXTENSION='.rpm'
         PACKAGE_MANAGER='yum'
-        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
     elif (cat /etc/*release |grep 'ID="sles"'); then
-        FILE_EXTENSION='.rpm'
         PACKAGE_MANAGER='zypper'
-        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
     elif (cat /etc/*release |grep 'ID="fedora"' || cat /etc/*release |grep 'ID=fedora'); then
-        FILE_EXTENSION='.rpm'
         PACKAGE_MANAGER='dnf'
-        AGENT_INSTALL_SYNTAX='rpm -i --nodigest'
     else
         printf "\n${Red}ERROR:  Unknown Release ID: $1 ${Color_Off}\n"
         cat /etc/*release
