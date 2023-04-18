@@ -1,23 +1,5 @@
 
-# resource "random_pet" "name" {
-# }
-
-# For full list of filters, see: https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
-
-# Ubuntu Focal
-#  name_regex       = "^ubuntu/images/hvm-ssd/ubuntu-focal-20.04.*"
-#  owners           = ["099720109477"]
-
-# Ubuntu Jammy
-# name_regex       =  "^ubuntu/images/hvm-ssd/ubuntu-jammy-22.04.*"
-# owners           = ["099720109477"]
-
-# AL2
-# name_regex       =  "^amzn2-ami-hvm-.*-gp2"
-# owners           = ["137112412989"]
-
 data "aws_ami" "latest_ami" {
-  #executable_users = ["self"]
   most_recent = true
   # AL2
   name_regex = "^amzn2-ami-hvm-.*-gp2"
@@ -70,7 +52,6 @@ EOF
 resource "aws_security_group" "sg_s1_wiz" {
   name = "aws-amzn2-cws-wiz-sg1"
 
-  # SSH access from the VPC
   ingress {
     from_port   = 22
     to_port     = 22
@@ -123,7 +104,6 @@ resource "aws_iam_role" "s1_wiz_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          #Action   = ["ec2:Describe*"]
           Action   = ["*"]
           Effect   = "Allow"
           Resource = "*"
