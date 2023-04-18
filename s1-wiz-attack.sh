@@ -118,7 +118,7 @@ awscli_check $PACKAGE_MANAGER
 
 # Use awscli to create a new EC2 instances to run a coinminer
 yellow_output "Creating new EC2 instance to run XMRig (coinminer)..."
-KEY_NAME=s1
+KEY_NAME=s1-wiz
 SG_NAME=SG-s1-wiz
 SG_DESC=SG-s1-wiz
 
