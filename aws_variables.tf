@@ -3,6 +3,14 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_access_key" {
+  description = "The AWS Access Key with which to launch the resources outlined in this template."
+}
+
+variable "aws_secret_access_key" {
+  description = "The AWS Secret Access Key with which to launch the resources outlined in this template."
+}
+
 variable "ec2_instance_type" {
   description = "AWS Instance Type to use for the EC2 instance."
   default     = "t3.medium"
