@@ -35,7 +35,7 @@ SECURITY_GROUPS=$(curl --silent http://169.254.169.254/latest/meta-data/security
 INTERFACE=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/)
 SUBNET_ID=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/subnet-id)
 VPC_ID=$(curl --silent http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/vpc-id)
-TAGS='ResourceType=instance,Tags=[{Key=Name,Value=cha-ching},{Key=Environment,Value=dev},{Key=Owner,Value=Johnny_Ataquero}]'
+TAGS='ResourceType=instance,Tags=[{Key=Name,Value=cha-ching},{Key=Environment,Value=dev},{Key=Owner,Value=Johnny_Ataquero},{Key=purpose,Value=s1-wiz-demo}]'
 IAM_INFO=$(curl --silent http://169.254.169.254/latest/meta-data/iam/info)
 INSTANCE_PROFILE_ARN=$(echo $IAM_INFO | jq -r ".InstanceProfileArn")
 
