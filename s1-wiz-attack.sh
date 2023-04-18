@@ -140,7 +140,8 @@ ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --insta
 --iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh --tag-specifications $TAGS )
 
 echo $ec2_run_instances > ec2_run_instances.txt
-
+INST_ID=$(cat ec2_run_instances.txt | jq ".Instances[0].InstanceId")
+echo "CLEAN UP CMD:  aws ec2 terminate-instance --instance-ids $INST_ID"
   
 # #--user-data file://$STARTUP_SCRIPT_PATH 
 # PUBLIC_KEY=
