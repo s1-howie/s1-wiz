@@ -32,7 +32,7 @@ variable "s1_site_token_aws" {
 
 variable "keypair" {
   description = "EC2 Key Pair"
-  default     = "s1"
+  default     = "s1-wiz"
 }
 
 variable "s1_console_prefix" {
