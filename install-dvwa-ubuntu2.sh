@@ -10,6 +10,7 @@ git clone https://github.com/digininja/DVWA.git .
 cp config/config.inc.php.dist config/config.inc.php
 
 # Reconfigure options
+cd /var/www/html/config/
 sed -i 's/impossible/low/' config.inc.php
 sed -i 's/true/false/' config.inc.php
 
