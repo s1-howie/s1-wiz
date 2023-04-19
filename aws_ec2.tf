@@ -1,39 +1,41 @@
 
-data "aws_ami" "latest_ami" {
-  most_recent = true
-  # AL2
-  name_regex = "^amzn2-ami-hvm-.*-gp2"
-  owners     = ["137112412989"]
+# data "aws_ami" "latest_ami" {
+#   most_recent = true
+#   # AL2
+#   name_regex = "^amzn2-ami-hvm-.*-gp2"
+#   owners     = ["137112412989"]
 
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+#   filter {
+#     name   = "root-device-type"
+#     values = ["ebs"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
 
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
+#   filter {
+#     name   = "state"
+#     values = ["available"]
+#   }
 
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
+#   filter {
+#     name   = "architecture"
+#     values = ["x86_64"]
+#   }
+# }
+
+
 
 resource "aws_instance" "s1_wiz_instance" {
   tags = merge(
     var.tags,
     {
-      "Name" = "aws-amzn2"
+      "Name" = "aws-ubuntu"
     }
   )
-  ami                    = data.aws_ami.latest_ami.image_id
+  ami                    = "ami-0aa2b7722dc1b5612"  #data.aws_ami.latest_ami.image_id
   instance_type          = var.ec2_instance_type
   vpc_security_group_ids = [aws_security_group.sg_s1_wiz.id]
   key_name               = var.keypair
@@ -44,7 +46,7 @@ resource "aws_instance" "s1_wiz_instance" {
   curl -sLO 'https://raw.githubusercontent.com/s1-howie/s1-agents-helper/master/s1-agent-helper.sh'
   chmod +x s1-agent-helper.sh; ./s1-agent-helper.sh ${var.s1_console_prefix} ${var.s1_api_key} ${var.s1_site_token_aws} ${var.s1_agent_status}
   curl -sLO 'https://s1demostorageaccount.z13.web.core.windows.net/scripts/install_docker.sh'; chmod +x install_docker.sh; ./install_docker.sh
-  docker run -d --privileged --name dvwa --restart unless-stopped -p 80:80 howiehowerton/dvwa-howie:v2
+  #docker run -d --privileged --name dvwa --restart unless-stopped -p 80:80 howiehowerton/dvwa-howie:v2
 EOF 
 }
 
@@ -118,7 +120,7 @@ output "instance_EIP" {
   value = aws_instance.s1_wiz_instance.public_ip
 }
 output "connect_via_ssh" {
-  value = "ssh -i ~/.ssh/${var.keypair}.pem ec2-user@${aws_instance.s1_wiz_instance.public_ip}"
+  value = "ssh -i ~/.ssh/${var.keypair}.pem ubuntu@${aws_instance.s1_wiz_instance.public_ip}"
 }
 output "start_instance" {
   value = "aws ec2 start-instances --instance-ids ${aws_instance.s1_wiz_instance.id}"
