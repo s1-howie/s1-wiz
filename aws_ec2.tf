@@ -42,7 +42,9 @@ resource "aws_instance" "s1_wiz_instance" {
   iam_instance_profile   = aws_iam_instance_profile.web_profile.name
   user_data              = <<EOF
 #! /bin/bash
-  hostnamectl set-hostname aws-ubuntu
+  apt update  -y && apt install -y jq curl
+  INSTANCE_ID=$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r ".instanceId")
+  hostnamectl set-hostname $INSTANCE_ID
   curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/ubuntu/install-dvwa-ubuntu2.sh; chmod +x install-dvwa-ubuntu2.sh; ./install-dvwa-ubuntu2.sh
   curl -sLO 'https://raw.githubusercontent.com/s1-howie/s1-agents-helper/master/s1-agent-helper.sh'
   chmod +x s1-agent-helper.sh; ./s1-agent-helper.sh ${var.s1_console_prefix} ${var.s1_api_key} ${var.s1_site_token_aws} ${var.s1_agent_status}

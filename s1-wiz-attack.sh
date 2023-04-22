@@ -135,7 +135,7 @@ aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port
 # Download xmrig.sh from repo to pass to EC2 instance
 curl -sLO https://raw.githubusercontent.com/s1-howie/s1-wiz/main/xmrig.sh
 
-ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 1 --instance-type $INSTANCE_TYPE \
+ec2_run_instances=$(aws ec2 run-instances --image-id $IMAGE_ID --count 3 --instance-type $INSTANCE_TYPE \
 --key-name $KEY_NAME --security-group-ids $SG_ID --subnet-id $SUBNET_ID \
 --iam-instance-profile "Arn=${INSTANCE_PROFILE_ARN}" --user-data file://xmrig.sh --tag-specifications $TAGS )
 
