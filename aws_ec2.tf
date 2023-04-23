@@ -29,12 +29,13 @@
 
 
 resource "aws_instance" "s1_wiz_instance" {
-  tags = merge(
-    var.tags,
-    {
-      "Name" = "aws-ubuntu"
-    }
-  )
+  tags = var.tags
+  # merge(
+  #   var.tags,
+  #   {
+  #     "Name" = "aws-ubuntu"
+  #   }
+  # )
   ami                    = "ami-0aa2b7722dc1b5612"  #data.aws_ami.latest_ami.image_id
   instance_type          = var.ec2_instance_type
   vpc_security_group_ids = [aws_security_group.sg_s1_wiz.id]
